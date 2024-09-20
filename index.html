@@ -1,0 +1,154 @@
+<!-- Styles -->
+<style>
+body {
+  background-color: yellow; /* Corpo amarelo */
+  margin: 0; 
+}
+
+#title {
+  text-align: center; /* Centraliza o título */
+  font-size: 24px; /* Tamanho da fonte */
+  font-weight: bold; /* Negrito */
+  margin: 20px 0; /* Margem acima e abaixo do título */
+  color: black; /* Cor do texto */
+}
+
+#resetZoom {
+  display: block; /* Exibe como bloco para centralização */
+  margin: 10px auto; /* Margem automática para centralizar */
+  padding: 10px; /* Espaçamento interno */
+  font-size: 24px; /* Tamanho do ícone */
+  cursor: pointer; /* Cursor em forma de ponteiro */
+  background-color: white; /* Fundo branco */
+  border: none; /* Sem borda */
+  border-radius: 50%; /* Bordas arredondadas (círculo) */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Sombra sutil */
+}
+
+#resetZoom:hover {
+  opacity: 0.8; /* Efeito ao passar o mouse */
+}
+
+#chartdiv {
+  width: 100%;
+  height: 500px;
+  background-color: black; /* Fundo do mapa preto */
+  padding: 20px 0; /* Espaçamento acima e abaixo do mapa */
+  box-sizing: border-box; 
+  overflow: hidden; 
+}
+
+#map {
+  width: 100%;
+  height: calc(100% - 20px); 
+}
+
+#info {
+  margin-top: 20px;
+  font-size: 18px;
+  color: black; /* Texto em preto */
+  text-align: center; /* Centraliza o texto */
+}
+
+
+.am5-map-polygon {
+  fill: gray; /* Continentes cinzas */
+}
+
+.am5-map-polygon:hover {
+  fill: rgba(0, 0, 255, 0.5); /* Azul opaco no hover */
+}
+</style>
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<!-- HTML -->
+<div id="title">INFORMAÇÕES SOBRE OS DIREITOS HUMANOS NO MUNDO</div>
+<button id="resetZoom" title="Resetar Zoom">
+  <i class="fas fa-home" style="color: black;"></i> <!-- Ícone preto -->
+</button>
+<div id="chartdiv">
+  <div id="map"></div> 
+</div>
+<div id="info"></div>
+
+<!-- Resources -->
+<script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/map.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/geodata/continentsLow.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+
+
+<script>
+am5.ready(function() {
+
+  var root = am5.Root.new("map");
+
+
+  root.setThemes([am5themes_Animated.new(root)]);
+
+
+  var chart = root.container.children.push(am5map.MapChart.new(root, {
+    panX: "rotateX",
+    projection: am5map.geoNaturalEarth1()
+  }));
+
+ 
+  var continentSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {
+    geoJSON: am5geodata_continentsLow,
+    exclude: ["antarctica"]
+  }));
+
+  
+  const continentNames = {
+    "Africa": "África",
+    "Asia": "Ásia",
+    "Europe": "Europa",
+    "North America": "América do Norte",
+    "Oceania": "Oceania",
+    "South America": "América do Sul"
+  };
+
+  continentSeries.mapPolygons.template.setAll({
+    tooltipText: "{name}",
+    interactive: true,
+    fill: am5.color(0xD3D3D3) // Cor cinza mais clara
+  });
+
+  continentSeries.mapPolygons.template.states.create("hover", {
+    fill: am5.color(0x0000CC) // Azul mais opaco no hover
+  });
+
+  
+  continentSeries.mapPolygons.template.events.on("click", function(ev) {
+    continentSeries.zoomToDataItem(ev.target.dataItem);
+    var continentName = continentNames[ev.target.dataItem.dataContext.name] || ev.target.dataItem.dataContext.name;
+    displayContinentInfo(continentName);
+  });
+
+
+  function displayContinentInfo(name) {
+    var infoText = {
+      "África": "Texto sobre a africa",
+      "Ásia": "Informações sobre a Ásia...",
+      "Europa": "Informações sobre a Europa...",
+      "América do Norte": "Informações sobre a América do Norte...",
+      "Oceania": "Informações sobre a Oceania...",
+      "América do Sul": "Informações sobre a América do Sul..."
+    };
+    document.getElementById("info").innerHTML = infoText[name] || "Informações não disponíveis.";
+  }
+
+ 
+  continentSeries.mapPolygons.template.events.on("over", function(ev) {
+    var continentName = continentNames[ev.target.dataItem.dataContext.name] || ev.target.dataItem.dataContext.name;
+    ev.target.set("tooltipText", continentName);
+  });
+
+  
+  document.getElementById("resetZoom").addEventListener("click", function() {
+    chart.zoomOut(); // Reseta o zoom do mapa
+  });
+}); 
+</script>

@@ -1,0 +1,50 @@
+* {
+    margin: 0;
+    padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+    background-color: #FFFF00;
+    background-image: url("./images/fundo.png");
+    background-repeat: no-repeat;
+    background-position: calc(100% - 200px) center; 
+    font-family: sans-serif;
+	align-items: right
+}
+
+
+svg path {
+    fill: #042647;
+    stroke: #eee;
+    stroke-width: .25;
+}
+
+svg path:hover {
+    fill: #3891eb;
+    transition: 0.6s;
+    cursor: pointer;
+}
+
+.container {
+    display: flex;
+    justify-content: start;
+    align-items: flex-start;
+    padding: 20px;
+}
+
+.map {
+    display: flex;
+    justify-content: start;
+    align-items: center ;
+	
+   
+}
+
+.info-box {
+    max-width: 400px;
+    background-color: white;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+}
